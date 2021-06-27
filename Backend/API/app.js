@@ -12,12 +12,12 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Proves that the server works fine by responding with 'Test'
-app.get('/', async (req, res, next) => {
+app.get('/api', async (req, res, next) => {
     const messages = await prisma.test.findMany();
     res.send(messages);
 })
 
-app.get('/:id', async(req, res, next) => {
+app.get('/api/:id', async(req, res, next) => {
     const id = Number(req.params.id);
     const message = await prisma.test.findUnique({
         where: {id}
@@ -25,7 +25,7 @@ app.get('/:id', async(req, res, next) => {
     res.send(message);
 })
 
-app.post('/', async (req, res, next) => {
+app.post('/api', async (req, res, next) => {
     const newMessage = await prisma.test.create({data:{message: req.body.message}});
     res.status(201).send(newMessage);
 })
