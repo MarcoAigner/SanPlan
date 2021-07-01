@@ -50,7 +50,7 @@ model articleUsage {
 }
 
 model medicalService {
-  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  id            Int     @unique @default(autoincrement()) @db.UnsignedInt
   serviceId     Int     @map("service_id") @db.UnsignedInt
   number        String  @unique @db.VarChar(45)
   contactPerson String? @map("contact_person") @db.VarChar(45)
@@ -58,6 +58,7 @@ model medicalService {
   uuid          String  @unique @db.VarChar(36)
   service       Service @relation(fields: [serviceId], references: [id])
 
+  @@id([id, serviceId])
   @@index([serviceId], name: "fk_medical_service_service1_idx")
   @@map("medical_service")
 }
@@ -68,7 +69,7 @@ model Person {
   lastName      String         @map("last_name") @db.VarChar(60)
   uuid          String         @unique @db.VarChar(36)
   article_usage articleUsage[]
-  emt_duty      emtDuty[]     @relation("emt_dutyToperson")
+  emt_duty      emtDuty[]      @relation("emt_dutyToperson")
 
   @@map("person")
 }
@@ -79,10 +80,11 @@ model Service {
   title           String           @db.VarChar(70)
   start           DateTime         @db.DateTime(0)
   end             DateTime         @db.DateTime(0)
+  active          Int              @default(1) @db.TinyInt
   uuid            String           @unique @db.VarChar(36)
   address         Address?         @relation(fields: [address_id], references: [id])
   article_usage   articleUsage[]
-  emt_duty        emtDuty[]       @relation("emt_dutyToservice")
+  emt_duty        emtDuty[]        @relation("emt_dutyToservice")
   medical_service medicalService[]
 
   @@index([address_id], name: "fk_service_address1_idx")
@@ -90,14 +92,13 @@ model Service {
 }
 
 model emtDuty {
-  personId  Int     @db.UnsignedInt @map("person_id")
-  serviceId Int     @db.UnsignedInt @map("service_id")
-  person     Person  @relation("emt_dutyToperson", fields: [personId], references: [id])
-  service    Service @relation("emt_dutyToservice", fields: [serviceId], references: [id])
+  personId  Int     @map("person_id") @db.UnsignedInt
+  serviceId Int     @map("service_id") @db.UnsignedInt
+  person    Person  @relation("emt_dutyToperson", fields: [personId], references: [id])
+  service   Service @relation("emt_dutyToservice", fields: [serviceId], references: [id])
 
   @@id([personId, serviceId])
   @@index([personId], name: "fk_person_has_service_person1_idx")
   @@index([serviceId], name: "fk_person_has_service_service1_idx")
-
   @@map("emt_duty")
 }
