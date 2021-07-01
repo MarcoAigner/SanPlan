@@ -16,6 +16,10 @@ app.use(morgan('dev'));
 
 // Navigate further through the api from here
 app.use('/api', apiRouter)
+  
+app.use((error, req, res, next) => {
+  res.status(500).send(error.message); // Internal server error
+})
 
 // Dummy-message on default url
 app.get('/', async (req, res, next) => {
