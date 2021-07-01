@@ -83,7 +83,7 @@ model Service {
   active          Int              @default(1) @db.TinyInt
   uuid            String           @unique @db.VarChar(36) @default(dbgenerated("uuid()"))
   address         Address?         @relation(fields: [address_id], references: [id])
-  article_usage   articleUsage[]
+  article_usage   articleUsage[] 
   emt_duty        emtDuty[]        @relation("emt_dutyToservice")
   medical_service medicalService[]
 
