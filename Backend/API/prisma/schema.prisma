@@ -7,8 +7,97 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Test {
-  id      Int    @id @default(autoincrement())
-  message String @db.VarChar(45)
-  @@map("test")
+model Address {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  address     String    @unique @db.VarChar(60)
+  street      String    @db.VarChar(45)
+  houseNumber String?   @map("house_number") @db.VarChar(45)
+  postalCode  String?   @map("postal_code") @db.VarChar(45)
+  city        String?   @db.VarChar(45)
+  uuid        String    @unique @db.VarChar(36)
+  service     Service[]
+
+  @@map("address")
+}
+
+model Article {
+  id            Int            @id @default(autoincrement()) @db.UnsignedInt
+  name          String         @db.VarChar(60)
+  unit          String         @db.VarChar(60)
+  description   String?        @db.VarChar(200)
+  article_usage articleUsage[]
+
+  @@map("article")
+}
+
+model articleUsage {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  serviceId Int      @map("service_id") @db.UnsignedInt
+  personId  Int      @map("person_id") @db.UnsignedInt
+  articleId Int      @map("article_id") @db.UnsignedInt
+  quantity  Int      @db.UnsignedInt
+  time      DateTime @db.DateTime(0)
+  status    String?  @default("Verbraucht") @db.VarChar(45)
+  uuid      String   @unique @db.VarChar(36)
+  article   Article  @relation(fields: [articleId], references: [id])
+  person    Person   @relation(fields: [personId], references: [id])
+  service   Service  @relation(fields: [serviceId], references: [id])
+
+  @@index([articleId], name: "fk_article_usage_article_idx")
+  @@index([personId], name: "fk_article_usage_person1_idx")
+  @@index([serviceId], name: "fk_article_usage_service1_idx")
+  @@map("article_usage")
+}
+
+model medicalService {
+  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  serviceId     Int     @map("service_id") @db.UnsignedInt
+  number        String  @unique @db.VarChar(45)
+  contactPerson String? @map("contact_person") @db.VarChar(45)
+  annotations   String? @db.VarChar(200)
+  uuid          String  @unique @db.VarChar(36)
+  service       Service @relation(fields: [serviceId], references: [id])
+
+  @@index([serviceId], name: "fk_medical_service_service1_idx")
+  @@map("medical_service")
+}
+
+model Person {
+  id            Int            @id @default(autoincrement()) @db.UnsignedInt
+  firstName     String         @map("first_name") @db.VarChar(60)
+  lastName      String         @map("last_name") @db.VarChar(60)
+  uuid          String         @unique @db.VarChar(36)
+  article_usage articleUsage[]
+  emt_duty      emtDuty[]     @relation("emt_dutyToperson")
+
+  @@map("person")
+}
+
+model Service {
+  id              Int              @id @default(autoincrement()) @db.UnsignedInt
+  address_id      Int?             @db.UnsignedInt
+  title           String           @db.VarChar(70)
+  start           DateTime         @db.DateTime(0)
+  end             DateTime         @db.DateTime(0)
+  uuid            String           @unique @db.VarChar(36)
+  address         Address?         @relation(fields: [address_id], references: [id])
+  article_usage   articleUsage[]
+  emt_duty        emtDuty[]       @relation("emt_dutyToservice")
+  medical_service medicalService[]
+
+  @@index([address_id], name: "fk_service_address1_idx")
+  @@map("service")
+}
+
+model emtDuty {
+  personId  Int     @db.UnsignedInt @map("person_id")
+  serviceId Int     @db.UnsignedInt @map("service_id")
+  person     Person  @relation("emt_dutyToperson", fields: [personId], references: [id])
+  service    Service @relation("emt_dutyToservice", fields: [serviceId], references: [id])
+
+  @@id([personId, serviceId])
+  @@index([personId], name: "fk_person_has_service_person1_idx")
+  @@index([serviceId], name: "fk_person_has_service_service1_idx")
+
+  @@map("emt_duty")
 }
