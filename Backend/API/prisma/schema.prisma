@@ -14,7 +14,7 @@ model Address {
   houseNumber String?   @map("house_number") @db.VarChar(45)
   postalCode  String?   @map("postal_code") @db.VarChar(45)
   city        String?   @db.VarChar(45)
-  uuid        String    @unique @db.VarChar(36)
+  uuid        String    @unique @db.VarChar(36) @default(dbgenerated("uuid()"))
   service     Service[]
 
   @@map("address")
@@ -38,7 +38,7 @@ model articleUsage {
   quantity  Int      @db.UnsignedInt
   time      DateTime @db.DateTime(0)
   status    String?  @default("Verbraucht") @db.VarChar(45)
-  uuid      String   @unique @db.VarChar(36)
+  uuid      String   @unique @db.VarChar(36) @default(dbgenerated("uuid()"))
   article   Article  @relation(fields: [articleId], references: [id])
   person    Person   @relation(fields: [personId], references: [id])
   service   Service  @relation(fields: [serviceId], references: [id])
@@ -55,7 +55,7 @@ model medicalService {
   number        String  @unique @db.VarChar(45)
   contactPerson String? @map("contact_person") @db.VarChar(45)
   annotations   String? @db.VarChar(200)
-  uuid          String  @unique @db.VarChar(36)
+  uuid          String  @unique @db.VarChar(36) @default(dbgenerated("uuid()"))
   service       Service @relation(fields: [serviceId], references: [id])
 
   @@id([id, serviceId])
@@ -67,7 +67,7 @@ model Person {
   id            Int            @id @default(autoincrement()) @db.UnsignedInt
   firstName     String         @map("first_name") @db.VarChar(60)
   lastName      String         @map("last_name") @db.VarChar(60)
-  uuid          String         @unique @db.VarChar(36)
+  uuid          String         @unique @db.VarChar(36) @default(dbgenerated("uuid()"))
   article_usage articleUsage[]
   emt_duty      emtDuty[]      @relation("emt_dutyToperson")
 
@@ -81,7 +81,7 @@ model Service {
   start           DateTime         @db.DateTime(0)
   end             DateTime         @db.DateTime(0)
   active          Int              @default(1) @db.TinyInt
-  uuid            String           @unique @db.VarChar(36)
+  uuid            String           @unique @db.VarChar(36) @default(dbgenerated("uuid()"))
   address         Address?         @relation(fields: [address_id], references: [id])
   article_usage   articleUsage[]
   emt_duty        emtDuty[]        @relation("emt_dutyToservice")
