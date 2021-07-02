@@ -36,11 +36,11 @@ articleUsageRouter.get("/:uuid", async (req, res, next) => {
 // POST a new article-usage
 articleUsageRouter.post("/", async (req, res, next) => {
   try {
-    const {serviceUuid, articleId, quantity, firstName, lastName} = req.body;
+    const {serviceUuid, articleId, quantity, firstName, lastName, time} = req.body;
     const newArticleUsage = await prisma.articleUsage.create({
       data: {
         quantity: parseInt(quantity),
-        time: new Date().toISOString(), // TODO Change into variable when Frontend is implemented
+        time,
         service: {
           connect: {uuid: serviceUuid}
         },

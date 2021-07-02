@@ -61,14 +61,16 @@
                       </v-chip-group>
                     </v-skeleton-loader>
                       <br>
-                      <h2>Stückzahl</h2>
+                      <h2>Menge</h2>
+                      <br>
+                      <br>
                       <br>
                     <v-slider
                       min="1"
                       max="10"
                       v-model="quantity"
                       color="primary"
-                      thumb-label
+                      thumb-label="always"
                       thumb-size="40"
                     >
                       <template v-slot:prepend>
@@ -78,7 +80,7 @@
                         <v-icon color="primary" @click="incrementQuantity">mdi-plus</v-icon>
                       </template>
                     </v-slider>
-                    <v-btn :disabled="loading" @click="post" color="primary">Materialverbrauch speichern</v-btn>
+                    <v-btn  :disabled="loading" @click="post" color="primary">Als verbraucht verbuchen</v-btn>
                     </v-card-text>
                 </v-card>
               </v-col>
