@@ -16,11 +16,11 @@ articleUsageRouter.get("/", async (req, res, next) => {
 });
 
 // GET all articles used during one service by service uuid
-articleUsageRouter.get("/uuid", async (req, res, next) => {
+articleUsageRouter.get("/:uuid", async (req, res, next) => {
   try {
     const uuid = req.params.uuid;
-    const foundArticleUsage = await prisma.articleUsage.findUnique({
-      where: { uuid },
+    const foundArticleUsage = await prisma.articleUsage.findMany({
+      where: { service: {uuid} },
       include: { article: true, person: true },
     });
     if (!foundArticleUsage) {
