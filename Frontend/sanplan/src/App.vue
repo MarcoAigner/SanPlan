@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <v-main>
-      <!--<Test :messages="messages" @msg-provided="postMessage"></Test>-->
       <ArticleUsage
         :articleUsages="articleUsages"
         :articles="articles"
@@ -12,7 +11,6 @@
 </template>
 
 <script>
-// import Test from './components/Test'
 import ArticleUsage from './components/ArticleUsage.vue'
 const axios = require('axios').default
 
@@ -20,7 +18,6 @@ export default {
   name: 'App',
 
   components: {
-    // Test
     ArticleUsage
   },
 
@@ -31,7 +28,6 @@ export default {
     articles: null
   }),
   mounted () {
-    // this.getMessages()
     this.getServices()
     this.getArticleUsage()
     this.getArticles()
