@@ -40,16 +40,17 @@
                       hide-details="auto"
                     ></v-autocomplete>
                     <br>
+                    <v-skeleton-loader
+                      :loading="!articleSelected"
+                      type="chip"
+                      boilerplate
+                      transition="fade-transition"
+                    >
                       <v-chip-group
                         mandatory
                         active-class="primary--text"
                         v-model="unit"
                       >
-                      <v-skeleton-loader
-                      v-if="!articleSelected"
-                      type="chip"
-                      boilerplate
-                    ></v-skeleton-loader>
                         <v-chip
                             v-show="articleSelected"
                             outlined
@@ -58,6 +59,7 @@
                             :value="unit.id"
                         >{{ unit.unit }}</v-chip>
                       </v-chip-group>
+                    </v-skeleton-loader>
                       <br>
                       <h2>Stückzahl</h2>
                       <br>
