@@ -2,7 +2,7 @@
     <v-container class="fill-height" fluid>
             <v-row align="center" justify="center">
               <v-col cols="12" sm="8">
-                <v-card>
+                <v-card :loading="loading">
                     <v-toolbar color="primary" dark flat>
                         <v-toolbar-title>SanWD: Ulm vs. Oldenburg</v-toolbar-title>
                     </v-toolbar>
@@ -121,7 +121,7 @@ export default {
   computed: {
     articleUsage: function () {
       return {
-        serviceUuid: 'f892ba64-daa8-11eb-93c1-0c9d92c91130',
+        serviceUuid: '516696a4-dd99-11eb-8a3c-0c9d92c91130',
         articleId: this.unit,
         quantity: this.quantity,
         firstName: 'Max',
