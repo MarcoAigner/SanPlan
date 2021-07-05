@@ -7,28 +7,27 @@
                         <v-toolbar-title>SanWD: Ulm vs. Oldenburg</v-toolbar-title>
                     </v-toolbar>
                     <v-card-text>
-                    <v-simple-table>
-                      <template>
-                        <thead>
-                          <tr>
-                            <th class="text-left">Artikel</th>
-                            <th class="text-left">Einheit</th>
-                            <th class="text-left">Stück</th>
-                            <th class="text-left">Verbraucht von</th>
-                            <th class="text-left">Zeitpunkt</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="articleUsage in articleUsages" :key="articleUsage.id">
-                            <td>{{ articleUsage.article.name }}</td>
-                            <td>{{ articleUsage.article.unit}}</td>
-                            <td>{{ articleUsage.quantity}}</td>
-                            <td>{{ articleUsage.person.lastName }}, {{articleUsage.person.firstName}}</td>
-                            <td>{{ new Date(articleUsage.time).toLocaleString('de-DE') }}</td>
-                          </tr>
-                        </tbody>
-                      </template>
-                    </v-simple-table>
+                    <br>
+                    <v-data-table
+                      :headers="tableHeaders"
+                      :items="tableData"
+                      :loading="loading"
+                      loading-text="Material wird abgerufen"
+                      no-data-text="Kein Material in der Datenbank"
+                      sort-by-text="Sortieren nach"
+                      :footer-props="{
+                      showFirstLastPage: true,
+                      firstIcon: 'mdi-arrow-collapse-left',
+                      lastIcon: 'mdi-arrow-collapse-right',
+                      prevIcon: 'mdi-minus',
+                      nextIcon: 'mdi-plus',
+                      'items-per-page-text': 'Artikel pro Seite',
+                      }"
+                      :header-props="{
+                      'sort-by-text': 'Sortiere nach'
+                      }"
+                    >
+                    </v-data-table>
                     <br>
                     <v-autocomplete
                       id="article"
@@ -80,7 +79,7 @@
                         <v-icon color="primary" @click="incrementQuantity">mdi-plus</v-icon>
                       </template>
                     </v-slider>
-                    <v-btn  :disabled="loading" @click="post" color="primary">Als verbraucht verbuchen</v-btn>
+                    <v-btn  :disabled="everythingSelected" @click="post" color="primary">Als verbraucht verbuchen</v-btn>
                     </v-card-text>
                 </v-card>
               </v-col>
@@ -95,7 +94,32 @@ export default {
     loading: false,
     article: '',
     unit: null,
-    quantity: 1
+    quantity: 1,
+    tableData: [],
+    tableHeaders: [
+      {
+        text: 'Artikel',
+        align: 'start',
+        value: 'article'
+      },
+      {
+        text: 'Einheit',
+        value: 'unit'
+      },
+      {
+        text: 'Stück',
+        value: 'quantity'
+      },
+      {
+        text: 'Verbraucht von',
+        value: 'person'
+      },
+      {
+        text: 'Zeitpunkt',
+        value: 'time'
+      }
+
+    ]
   }),
   props: {
     articleUsages: Array,
@@ -104,12 +128,27 @@ export default {
   watch: {
     articleUsages: function () {
       this.loading = false
+      this.getTableData()
     }
   },
   methods: {
+    getTableData: function () {
+      const tableData = []
+      this.articleUsages.map((el) => tableData.push({
+        article: el.article.name,
+        unit: el.article.unit,
+        quantity: el.quantity,
+        person: `${el.person.lastName}, ${el.person.firstName}`,
+        time: new Date(el.time).toLocaleString('de-DE')
+      }))
+      this.tableData = tableData.reverse()
+    },
     post: function () {
       this.$emit('article-used', this.articleUsage)
       this.loading = true
+      this.article = null
+      this.unit = null
+      this.quantity = 1
     },
     incrementQuantity: function () {
       this.quantity++
@@ -119,9 +158,16 @@ export default {
     }
   },
   computed: {
+    everythingSelected: function () {
+      if (!this.article || !this.unit) {
+        return true
+      } else {
+        return false
+      }
+    },
     articleUsage: function () {
       return {
-        serviceUuid: '516696a4-dd99-11eb-8a3c-0c9d92c91130',
+        serviceUuid: 'cc5a3c1e-ddbe-11eb-8a3c-0c9d92c91130',
         articleId: this.unit,
         quantity: this.quantity,
         firstName: 'Max',
