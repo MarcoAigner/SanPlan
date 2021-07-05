@@ -9,6 +9,7 @@
                     <v-card-text>
                     <br>
                     <v-data-table
+                    height="25em"
                       :headers="tableHeaders"
                       :items="tableData"
                       :loading="loading"
@@ -29,7 +30,26 @@
                     >
                     </v-data-table>
                     <br>
-                    <v-autocomplete
+                    <v-dialog
+                    v-model="dialog"
+                    width="500">
+                      <template v-slot:activator="{ on, attrs }">
+                      <div class="text-xs-center">
+                        <v-btn
+                        color="primary"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                      >Materialverbrauch dokumentieren</v-btn>
+                      </div>
+                    </template>
+                    <v-card>
+                      <v-toolbar color="primary" dark flat>
+                        <v-toolbar-title>Was wurde verbraucht?</v-toolbar-title>
+                    </v-toolbar>
+                    <v-card-text>
+                      <br>
+                      <v-autocomplete
                       id="article"
                       label="Artikel"
                       :items="articleTitles"
@@ -79,7 +99,16 @@
                         <v-icon color="primary" @click="incrementQuantity">mdi-plus</v-icon>
                       </template>
                     </v-slider>
-                    <v-btn  :disabled="everythingSelected" @click="post" color="primary">Als verbraucht verbuchen</v-btn>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-row justify="space-around">
+                    <v-btn   outlined :disabled="everythingSelected" @click="post" color="primary">Weiterer Artikel</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn   :disabled="everythingSelected" @click="postClose" color="primary">Ende</v-btn>
+                    </v-row>
+                    </v-card-actions>
+                    </v-card>
+                    </v-dialog>
                     </v-card-text>
                 </v-card>
               </v-col>
@@ -92,6 +121,7 @@ export default {
   name: 'ArticleUsage',
   data: () => ({
     loading: false,
+    dialog: false,
     article: '',
     unit: null,
     quantity: 1,
@@ -148,7 +178,14 @@ export default {
       this.loading = true
       this.article = null
       this.unit = null
+    },
+    postClose: function () {
+      this.$emit('article-used', this.articleUsage)
+      this.loading = true
+      this.article = null
+      this.unit = null
       this.quantity = 1
+      this.dialog = false
     },
     incrementQuantity: function () {
       this.quantity++
