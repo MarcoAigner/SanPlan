@@ -50,12 +50,14 @@
                       <br>
                       <v-autocomplete
                       id="article"
+                      ref="article"
                       label="Artikel"
                       :items="articleTitles"
                       v-model="article"
                       outlined
                       spellcheck="false"
                       hide-details="auto"
+                      @change="removeMobileKeyboard"
                     ></v-autocomplete>
                     <br>
                     <v-skeleton-loader
@@ -101,7 +103,9 @@
                     </v-card-text>
                     <v-card-actions>
                       <v-row justify="space-around">
-                    </v-row>
+                        <v-btn   outlined :disabled="everythingSelected" @click="post" color="primary">Weiterer Artikel</v-btn>
+                        <v-btn   :disabled="everythingSelected" @click="postClose" color="primary">Ende</v-btn>
+                      </v-row>
                     </v-card-actions>
                     <br>
                     </v-card>
@@ -159,6 +163,9 @@ export default {
     }
   },
   methods: {
+    removeMobileKeyboard: function () {
+      this.$refs.article.blur()
+    },
     getTableData: function () {
       const tableData = []
       this.articleUsages.map((el) => tableData.push({
