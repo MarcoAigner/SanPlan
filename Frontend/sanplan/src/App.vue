@@ -34,10 +34,11 @@ export default {
   },
   methods: {
     postArticleUsage: async function (articleUsage) {
+      const now = new Date().toISOString()
+      articleUsage.time = now
       await axios.post('/api/article-usage', articleUsage)
-        .then(response => { console.log(response) })
         .catch(error => { console.log(error) })
-      this.getArticleUsage()
+      await this.getArticleUsage()
     },
     getServices: async function () {
       await axios.get('/api/medical-service?active=true')
@@ -45,7 +46,7 @@ export default {
         .catch(error => { console.log(error) })
     },
     getArticleUsage: async function () {
-      await axios.get('/api/article-usage/f892ba64-daa8-11eb-93c1-0c9d92c91130')
+      await axios.get('/api/article-usage/cc5a3c1e-ddbe-11eb-8a3c-0c9d92c91130')
         .then(response => { this.articleUsages = response.data })
         .catch(error => { console.log(error) })
     },

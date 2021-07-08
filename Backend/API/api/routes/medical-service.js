@@ -54,7 +54,7 @@ medicalServiceRouter.get("/:uuid", async (req, res, next) => {
 // CREATE a new medical-service and return it
 medicalServiceRouter.post("/", async (req, res, next) => {
   try {
-    const { title, start, end, active } = req.body;
+    const { title, start, end } = req.body;
     const { address, street, houseNumber, postalCode, city } = req.body.address;
     const { number, contactPerson, annotations } = req.body.medicalService;
 
@@ -63,7 +63,7 @@ medicalServiceRouter.post("/", async (req, res, next) => {
         title,
         start: new Date(start),
         end: new Date(end),
-        active,
+        active: 1,
         address: {
           connectOrCreate: {
             where: { address },
