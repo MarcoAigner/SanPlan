@@ -14,7 +14,7 @@ app.use(express.json());
 //Log every request using morgan
 app.use(morgan('dev'));
 
-app.use('/', express.static('dist'));
+//app.use('/', express.static('dist'));
 
 // Navigate further through the api from here
 app.use('/api', apiRouter)
