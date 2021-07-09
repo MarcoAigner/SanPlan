@@ -7,7 +7,6 @@ articleRouter.get("/", async (req, res, next) => {
   try {
     let articles = await prisma.article.findMany();
     articles = formatArticles(articles);
-    console.log(JSON.stringify(articles, null, 2));
     res.send(articles);
   } catch (error) {
     next(error); // Global error-handling in app.js
@@ -34,6 +33,7 @@ function formatArticles(unformattedArticles) {
         id: article.id,
         unit: article.unit,
         description: article.description,
+        timesUsed: article.timesUsed
       });
     }
   });
