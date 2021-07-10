@@ -118,6 +118,7 @@
 </template>
 
 <script>
+const axios = require('axios').default
 export default {
   name: 'ArticleUsage',
   data: () => ({
@@ -126,6 +127,7 @@ export default {
     article: '',
     unit: null,
     quantity: 1,
+    articleUsages: [],
     tableData: [],
     tableHeaders: [
       {
@@ -153,7 +155,6 @@ export default {
     ]
   }),
   props: {
-    articleUsages: Array,
     articles: Array
   },
   watch: {
@@ -165,6 +166,20 @@ export default {
   methods: {
     removeMobileKeyboard: function () {
       this.$refs.article.blur()
+    },
+    postArticleUsage: async function (articleUsage) {
+      const now = new Date().toISOString()
+      articleUsage.time = now
+      console.log(JSON.stringify(articleUsage, null, 2))
+      await axios.post('/api/article-usage', articleUsage)
+        .catch(error => { console.log(error) })
+      await this.getArticleUsage()
+    },
+    getArticleUsage: async function (serviceUuid) {
+      const url = `/api/article-usage/${serviceUuid}`
+      await axios.get(url)
+        .then(response => { this.articleUsages = response.data })
+        .catch(error => { console.log(error) })
     },
     getTableData: function () {
       const tableData = []
@@ -208,11 +223,13 @@ export default {
     },
     articleUsage: function () {
       return {
-        serviceUuid: 'cc5a3c1e-ddbe-11eb-8a3c-0c9d92c91130',
+        serviceUuid: '272fc6c0-e08d-11eb-b768-0c9d92c91130',
         articleId: this.unit,
         quantity: this.quantity,
-        firstName: 'Max',
-        lastName: 'Mustermensch'
+        usedBy: {
+          firstName: 'Max',
+          lastName: 'Mustermensch'
+        }
       }
     },
     articleTitles: function () {
@@ -225,7 +242,15 @@ export default {
       if (this.article) {
         const currentArticle = this.articles.find(art => art.name === this.article)
         let units = currentArticle.units.map((unit) => ({ id: unit.id, unit: unit.unit }))
-        units = units.reverse()
+        units = units.sort((a, b) => {
+          if (a.timesUsed < b.timesUsed) {
+            return -1
+          }
+          if (a.timesUsed > b.timesUsed) {
+            return 1
+          }
+          return 0
+        })
         return units
       }
       return []
