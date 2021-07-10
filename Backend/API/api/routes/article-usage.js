@@ -12,7 +12,7 @@ articleUsageRouter.get("/:uuid", async (req, res, next) => {
       include: {article: true, usedBy: true, service: true}
     })
     if (!foundArticleUsage) {
-      res.status(404).send();
+      res.send(`No article usage has been recorded yet for service with uuid ${uuid}`);
     } else {
       res.send(foundArticleUsage);
     }
@@ -36,6 +36,7 @@ articleUsageRouter.get("/", async (req, res, next) => {
 // POST a new article-usage
 articleUsageRouter.post("/", async (req, res, next) => {
   try {
+    console.log/req.body;
     const {serviceUuid, articleId, quantity, time, annotation} = req.body;
     const {firstName, lastName} = req.body.usedBy;
     annotation ? annotation : null;
