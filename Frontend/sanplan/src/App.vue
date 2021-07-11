@@ -4,6 +4,7 @@
       <ArticleUsage
         :articles="articles"
         @article-used="postArticleUsage"
+        :services="services"
        ></ArticleUsage>
        <!--<Services
         :services="services"

@@ -4,7 +4,7 @@
               <v-col cols="12" sm="8">
                 <v-card :loading="loading">
                     <v-toolbar color="primary" dark flat>
-                        <v-toolbar-title>SanWD: Ulm vs. Oldenburg</v-toolbar-title>
+                        <v-toolbar-title>Materialverbrauch: {{services[0].title}}</v-toolbar-title>
                     </v-toolbar>
                     <v-card-text>
                     <br>
@@ -40,11 +40,21 @@
                         dark
                         v-bind="attrs"
                         v-on="on"
-                      >Materialverbrauch dokumentieren</v-btn>
+                      >Materialverbrauch melden</v-btn>
                     </template>
                     <v-card>
                       <v-toolbar color="primary" dark flat>
-                        <v-toolbar-title>Was wurde verbraucht?</v-toolbar-title>
+                          <v-row class="justify-space-between">
+                            <v-toolbar-title
+                          >Was wurde verbraucht?</v-toolbar-title>
+                          <v-btn
+                            icon
+                            dark
+                            @click="dialog = false"
+                          >
+                              <v-icon>mdi-close</v-icon>
+                          </v-btn>
+                          </v-row>
                     </v-toolbar>
                     <v-card-text>
                       <br>
@@ -102,9 +112,9 @@
                     </v-slider>
                     </v-card-text>
                     <v-card-actions>
-                      <v-row justify="space-around">
+                      <v-row class="justify-space-around">
                         <v-btn   outlined :disabled="everythingSelected" @click="post" color="primary">Weiterer Artikel</v-btn>
-                        <v-btn   :disabled="everythingSelected" @click="postClose" color="primary">Ende</v-btn>
+                        <v-btn   :disabled="everythingSelected" @click="postClose" color="primary">Meldung abschließen</v-btn>
                       </v-row>
                     </v-card-actions>
                     <br>
@@ -155,7 +165,8 @@ export default {
     ]
   }),
   props: {
-    articles: Array
+    articles: Array,
+    services: Array
   },
   watch: {
     articleUsages: function () {
