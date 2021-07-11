@@ -164,6 +164,9 @@ export default {
 
     ]
   }),
+  mounted () {
+    this.getArticleUsage()
+  },
   props: {
     articles: Array,
     services: Array
@@ -178,19 +181,13 @@ export default {
     removeMobileKeyboard: function () {
       this.$refs.article.blur()
     },
-    postArticleUsage: async function (articleUsage) {
-      const now = new Date().toISOString()
-      articleUsage.time = now
-      console.log(JSON.stringify(articleUsage, null, 2))
-      await axios.post('/api/article-usage', articleUsage)
-        .catch(error => { console.log(error) })
-      await this.getArticleUsage()
-    },
-    getArticleUsage: async function (serviceUuid) {
-      const url = `/api/article-usage/${serviceUuid}`
+    getArticleUsage: async function () {
+      this.loading = true
+      const url = `/api/article-usage/${this.serviceUuid}`
       await axios.get(url)
         .then(response => { this.articleUsages = response.data })
         .catch(error => { console.log(error) })
+      this.loading = false
     },
     getTableData: function () {
       const tableData = []
@@ -198,20 +195,26 @@ export default {
         article: el.article.name,
         unit: el.article.unit,
         quantity: el.quantity,
-        person: `${el.person.lastName}, ${el.person.firstName}`,
+        person: `${el.usedBy.lastName}, ${el.usedBy.firstName}`,
         time: new Date(el.time).toLocaleString('de-DE')
       }))
       this.tableData = tableData.reverse()
     },
-    post: function () {
-      this.$emit('article-used', this.articleUsage)
-      this.loading = true
+    post: async function () {
+      const now = new Date().toISOString()
+      this.articleUsage.time = now
+      await axios.post('/api/article-usage', this.articleUsage)
+        .catch(error => { console.log(error) })
+      await this.getArticleUsage(this.serviceUuid)
       this.article = null
       this.unit = null
     },
-    postClose: function () {
-      this.$emit('article-used', this.articleUsage)
-      this.loading = true
+    postClose: async function () {
+      const now = new Date().toISOString()
+      this.articleUsage.time = now
+      await axios.post('/api/article-usage', this.articleUsage)
+        .catch(error => { console.log(error) })
+      await this.getArticleUsage(this.serviceUuid)
       this.article = null
       this.unit = null
       this.quantity = 1
@@ -225,6 +228,13 @@ export default {
     }
   },
   computed: {
+    serviceUuid: function () {
+      if (this.services) {
+        return this.services[0].uuid
+      } else {
+        return null
+      }
+    },
     everythingSelected: function () {
       if (!this.article || !this.unit) {
         return true
@@ -234,7 +244,7 @@ export default {
     },
     articleUsage: function () {
       return {
-        serviceUuid: '272fc6c0-e08d-11eb-b768-0c9d92c91130',
+        serviceUuid: this.serviceUuid,
         articleId: this.unit,
         quantity: this.quantity,
         usedBy: {
