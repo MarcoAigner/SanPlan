@@ -1,20 +1,21 @@
 <template>
   <v-app>
     <v-main>
-      <ArticleUsage
+     <!--<ArticleUsage
         :articles="articles"
         @article-used="postArticleUsage"
         :services="services"
-       ></ArticleUsage>
+       ></ArticleUsage>-->
        <!--<Services
         :services="services"
        ></Services>-->
+       <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import ArticleUsage from './components/ArticleUsage.vue'
+// import ArticleUsage from './components/ArticleUsage.vue'
 // import Services from './components/Services.vue'
 const axios = require('axios').default
 
@@ -22,7 +23,7 @@ export default {
   name: 'App',
 
   components: {
-    ArticleUsage
+    // ArticleUsage
     // Services
   },
 
