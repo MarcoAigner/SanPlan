@@ -1,26 +1,10 @@
 <template>
     <v-container class="fill-height" fluid>
-      <v-toolbar color="primary" dark flat>
-                        <v-toolbar-title>Aktive Sanitätswachdienste</v-toolbar-title>
-                    </v-toolbar>
             <v-row align="center" justify="center">
               <v-col cols="12" sm="8">
-                    <!--<v-list-item
-                    two-line
-                      v-for="service in services"
-                      :key="service.id"
-                    >
-                      <v-list-item-content>
-                        <v-list-item-title>{{service.title}}</v-list-item-title>
-                        <v-list-item-subtitle v-if="service.medicalService">{{service.medicalService.number}}}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>-->
-                      <!--<v-list-item two-line v-for="service in services" :key="service.id">
-                        <v-list-item-content>
-                          <v-list-item-title>{{service.title}}</v-list-item-title>
-                          <v-list-item-subtitle>{{service.medicalService.number}}</v-list-item-subtitle>
-                        </v-list-item-content>
-                      </v-list-item>-->
+                <v-toolbar color="primary" dark flat>
+                        <v-toolbar-title>Aktive Sanitätswachdienste</v-toolbar-title>
+                        </v-toolbar>
                       <v-col
                         v-for="(service, id) in services"
                         :key="id"
@@ -31,19 +15,6 @@
                         >
                           <v-card-title>{{service.title}}</v-card-title>
                           <v-card-subtitle v-if="service.medicalService">{{service.medicalService.number}}</v-card-subtitle>
-                          <v-card-text>
-                            <br>
-                            <v-row justify="space-around">
-                              <p v-if="service.responsible">Einsatzleitung: {{service.responsible.firstName}} {{service.responsible.lastName}}</p>
-                              <p v-if="service.address">{{service.address.address}}</p>
-                              <v-col>
-                                <p>{{new Date(service.start).toLocaleString('de-DE')}}</p>
-                                <p> - </p>
-                                <p>{{new Date(service.end).toLocaleString('de-DE')}}</p>
-                              </v-col>
-                            </v-row>
-                          </v-card-text>
-                          <br>
                         </v-card>
                       </v-col>
               </v-col>
@@ -52,13 +23,15 @@
 </template>
 
 <script>
+const axios = require('axios').default
 export default {
   name: 'Services',
   data: () => ({
-    loading: false
+    loading: false,
+    services: []
   }),
-  props: {
-    services: Array
+  mounted () {
+    this.getServices()
   },
   watch: {
     services: function () {
@@ -66,6 +39,11 @@ export default {
     }
   },
   methods: {
+    getServices: async function () {
+      await axios.get('/api/medical-service?active=true')
+        .then(response => { this.services = response.data })
+        .catch(error => { console.log(error) })
+    },
     consoleLog: function () {
       console.log('Button clicked')
     }
