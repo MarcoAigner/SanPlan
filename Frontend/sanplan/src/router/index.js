@@ -6,6 +6,7 @@ import ArticleUsage from '@/components/ArticleUsage'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -13,7 +14,7 @@ export default new Router({
       component: Services
     },
     {
-      path: '/article-usage',
+      path: '/:service',
       name: 'ArticleUsage',
       component: ArticleUsage
     }

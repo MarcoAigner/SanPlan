@@ -4,7 +4,14 @@
               <v-col cols="12" sm="8">
                 <v-card :loading="loading">
                     <v-toolbar color="primary" dark flat>
-                        <v-toolbar-title>Materialverbrauch: {{services[0].title}}</v-toolbar-title>
+                      <v-btn
+                            icon
+                            dark
+                            @click="goBack"
+                          >
+                              <v-icon>mdi-arrow-left</v-icon>
+                          </v-btn>
+                        <v-toolbar-title>{{service.title}}</v-toolbar-title>
                     </v-toolbar>
                     <v-card-text>
                     <br>
@@ -33,7 +40,7 @@
                     <v-dialog
                     v-model="dialog"
                     width="500"
-                    scrollable="false">
+                    :scrollable="false">
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn
                         color="primary"
@@ -44,7 +51,7 @@
                     </template>
                     <v-card>
                       <v-toolbar color="primary" dark flat>
-                          <v-row class="justify-space-between">
+                          <v-row class="justify-space-between align-center pl-4">
                             <v-toolbar-title
                           >Was wurde verbraucht?</v-toolbar-title>
                           <v-btn
@@ -139,6 +146,9 @@ export default {
     quantity: 1,
     articleUsages: [],
     tableData: [],
+    service: {},
+    services: [],
+    articles: [],
     tableHeaders: [
       {
         text: 'Artikel',
@@ -164,9 +174,10 @@ export default {
 
     ]
   }),
-  props: {
-    articles: Array,
-    services: Array
+  mounted () {
+    this.getService()
+    this.getArticles()
+    this.getArticleUsage()
   },
   watch: {
     articleUsages: function () {
@@ -181,9 +192,27 @@ export default {
     removeMobileKeyboard: function () {
       this.$refs.article.blur()
     },
+    goBack: function () {
+      this.$router.go(-1)
+    },
+    getArticles: async function () {
+      await axios.get('/api/article')
+        .then(response => { this.articles = response.data })
+        .catch(error => { console.log(error) })
+    },
+    getServices: async function () {
+      await axios.get('/api/medical-service?active=true')
+        .then(response => { this.services = response.data })
+        .catch(error => { console.log(error) })
+    },
+    getService: async function () {
+      await axios.get(`/api/medical-service/${this.$route.params.service}`)
+        .then(response => { this.service = response.data })
+        .catch(error => console.log(error))
+    },
     getArticleUsage: async function () {
       this.loading = true
-      const url = `/api/article-usage/${this.serviceUuid}`
+      const url = `/api/article-usage/${this.$route.params.service}`
       await axios.get(url)
         .then(response => { this.articleUsages = response.data })
         .catch(error => { console.log(error) })
@@ -205,16 +234,17 @@ export default {
       this.articleUsage.time = now
       await axios.post('/api/article-usage', this.articleUsage)
         .catch(error => { console.log(error) })
-      await this.getArticleUsage(this.serviceUuid)
+      await this.getArticleUsage(this.$route.params.service)
       this.article = null
       this.unit = null
+      this.quantity = 1
     },
     postClose: async function () {
       const now = new Date().toISOString()
       this.articleUsage.time = now
       await axios.post('/api/article-usage', this.articleUsage)
         .catch(error => { console.log(error) })
-      await this.getArticleUsage(this.serviceUuid)
+      await this.getArticleUsage(this.$route.params.service)
       this.article = null
       this.unit = null
       this.quantity = 1
@@ -228,13 +258,6 @@ export default {
     }
   },
   computed: {
-    serviceUuid: function () {
-      if (this.services) {
-        return this.services[0].uuid
-      } else {
-        return null
-      }
-    },
     everythingSelected: function () {
       if (!this.article || !this.unit) {
         return true
@@ -244,7 +267,7 @@ export default {
     },
     articleUsage: function () {
       return {
-        serviceUuid: this.serviceUuid,
+        serviceUuid: this.$route.params.service,
         articleId: this.unit,
         quantity: this.quantity,
         usedBy: {
