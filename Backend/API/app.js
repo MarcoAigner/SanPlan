@@ -6,7 +6,7 @@ const app = express();
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 8081
 
-const corsAllowlist = ['https://marcoaigner.github.io'];
+const corsAllowlist = ['https://marcoaigner.github.io', 'http://localhost:8080'];
 
 const apiRouter = require('./api/api')
 
