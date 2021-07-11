@@ -4,7 +4,14 @@
               <v-col cols="12" sm="8">
                 <v-card :loading="loading">
                     <v-toolbar color="primary" dark flat>
-                        <v-toolbar-title>SanWD: Ulm vs. Oldenburg</v-toolbar-title>
+                      <v-btn
+                            icon
+                            dark
+                            @click="goBack"
+                          >
+                              <v-icon>mdi-arrow-left</v-icon>
+                          </v-btn>
+                        <v-toolbar-title>{{service.title}}</v-toolbar-title>
                     </v-toolbar>
                     <v-card-text>
                     <br>
@@ -33,18 +40,28 @@
                     <v-dialog
                     v-model="dialog"
                     width="500"
-                    scrollable="false">
+                    :scrollable="false">
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn
                         color="primary"
                         dark
                         v-bind="attrs"
                         v-on="on"
-                      >Materialverbrauch dokumentieren</v-btn>
+                      >Materialverbrauch melden</v-btn>
                     </template>
                     <v-card>
                       <v-toolbar color="primary" dark flat>
-                        <v-toolbar-title>Was wurde verbraucht?</v-toolbar-title>
+                          <v-row class="justify-space-between align-center pl-4">
+                            <v-toolbar-title
+                          >Was wurde verbraucht?</v-toolbar-title>
+                          <v-btn
+                            icon
+                            dark
+                            @click="dialog = false"
+                          >
+                              <v-icon>mdi-close</v-icon>
+                          </v-btn>
+                          </v-row>
                     </v-toolbar>
                     <v-card-text>
                       <br>
@@ -102,9 +119,9 @@
                     </v-slider>
                     </v-card-text>
                     <v-card-actions>
-                      <v-row justify="space-around">
+                      <v-row class="justify-space-around">
                         <v-btn   outlined :disabled="everythingSelected" @click="post" color="primary">Weiterer Artikel</v-btn>
-                        <v-btn   :disabled="everythingSelected" @click="postClose" color="primary">Ende</v-btn>
+                        <v-btn   :disabled="everythingSelected" @click="postClose" color="primary">Meldung abschließen</v-btn>
                       </v-row>
                     </v-card-actions>
                     <br>
@@ -118,6 +135,7 @@
 </template>
 
 <script>
+const axios = require('axios').default
 export default {
   name: 'ArticleUsage',
   data: () => ({
@@ -126,7 +144,11 @@ export default {
     article: '',
     unit: null,
     quantity: 1,
+    articleUsages: [],
     tableData: [],
+    service: {},
+    services: [],
+    articles: [],
     tableHeaders: [
       {
         text: 'Artikel',
@@ -152,19 +174,49 @@ export default {
 
     ]
   }),
-  props: {
-    articleUsages: Array,
-    articles: Array
+  mounted () {
+    this.getService()
+    this.getArticles()
+    this.getArticleUsage()
   },
   watch: {
     articleUsages: function () {
       this.loading = false
       this.getTableData()
+    },
+    services: function () {
+      this.getArticleUsage()
     }
   },
   methods: {
     removeMobileKeyboard: function () {
       this.$refs.article.blur()
+    },
+    goBack: function () {
+      this.$router.go(-1)
+    },
+    getArticles: async function () {
+      await axios.get('/api/article')
+        .then(response => { this.articles = response.data })
+        .catch(error => { console.log(error) })
+    },
+    getServices: async function () {
+      await axios.get('/api/medical-service?active=true')
+        .then(response => { this.services = response.data })
+        .catch(error => { console.log(error) })
+    },
+    getService: async function () {
+      await axios.get(`/api/medical-service/${this.$route.params.service}`)
+        .then(response => { this.service = response.data })
+        .catch(error => console.log(error))
+    },
+    getArticleUsage: async function () {
+      this.loading = true
+      const url = `/api/article-usage/${this.$route.params.service}`
+      await axios.get(url)
+        .then(response => { this.articleUsages = response.data })
+        .catch(error => { console.log(error) })
+      this.loading = false
     },
     getTableData: function () {
       const tableData = []
@@ -172,20 +224,27 @@ export default {
         article: el.article.name,
         unit: el.article.unit,
         quantity: el.quantity,
-        person: `${el.person.lastName}, ${el.person.firstName}`,
+        person: `${el.usedBy.lastName}, ${el.usedBy.firstName}`,
         time: new Date(el.time).toLocaleString('de-DE')
       }))
       this.tableData = tableData.reverse()
     },
-    post: function () {
-      this.$emit('article-used', this.articleUsage)
-      this.loading = true
+    post: async function () {
+      const now = new Date().toISOString()
+      this.articleUsage.time = now
+      await axios.post('/api/article-usage', this.articleUsage)
+        .catch(error => { console.log(error) })
+      await this.getArticleUsage(this.$route.params.service)
       this.article = null
       this.unit = null
+      this.quantity = 1
     },
-    postClose: function () {
-      this.$emit('article-used', this.articleUsage)
-      this.loading = true
+    postClose: async function () {
+      const now = new Date().toISOString()
+      this.articleUsage.time = now
+      await axios.post('/api/article-usage', this.articleUsage)
+        .catch(error => { console.log(error) })
+      await this.getArticleUsage(this.$route.params.service)
       this.article = null
       this.unit = null
       this.quantity = 1
@@ -208,11 +267,13 @@ export default {
     },
     articleUsage: function () {
       return {
-        serviceUuid: 'cc5a3c1e-ddbe-11eb-8a3c-0c9d92c91130',
+        serviceUuid: this.$route.params.service,
         articleId: this.unit,
         quantity: this.quantity,
-        firstName: 'Max',
-        lastName: 'Mustermensch'
+        usedBy: {
+          firstName: 'Max',
+          lastName: 'Mustermensch'
+        }
       }
     },
     articleTitles: function () {
@@ -225,7 +286,15 @@ export default {
       if (this.article) {
         const currentArticle = this.articles.find(art => art.name === this.article)
         let units = currentArticle.units.map((unit) => ({ id: unit.id, unit: unit.unit }))
-        units = units.reverse()
+        units = units.sort((a, b) => {
+          if (a.timesUsed < b.timesUsed) {
+            return -1
+          }
+          if (a.timesUsed > b.timesUsed) {
+            return 1
+          }
+          return 0
+        })
         return units
       }
       return []
