@@ -8,7 +8,7 @@ INSERT INTO `sanplanba`.`person` (`first_name`, `last_name`) VALUES ('Lisa', 'Bo
 INSERT INTO `sanplanba`.`person` (`first_name`, `last_name`) VALUES ('Otto', 'Päde');
 
 INSERT INTO `sanplanba`.`service` (`address_id`, `person_id`, `title`, `start`, `end`, `active`) VALUES ('2', '3', 'Dienstabend: Zeltaufbau', '2021-06-29 19:00:00', '2021-06-29 21:00:00', '0');
-INSERT INTO `sanplanba`.`service` (`address_id`, `person_id`, `title`, `start`, `end`) VALUES ('1', '4', 'SanWD: Ulm vs. Oldenburg', '2021-06-30 15:00:00', '2021-06-30 19:00:00');
+INSERT INTO `sanplanba`.`service` (`address_id`, `person_id`, `title`, `start`, `end`) VALUES ('1', '4', 'Basketball: Ulm vs. Oldenburg', '2021-06-30 15:00:00', '2021-06-30 19:00:00');
 
 INSERT INTO `sanplanba`.`medical_service` (`service_id`, `number`, `contact_person`, `annotations`) VALUES ('2', '#1/21', 'Herr Müller', 'Seiteneingang verwenden');
 
