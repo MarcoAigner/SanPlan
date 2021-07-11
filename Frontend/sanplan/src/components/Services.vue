@@ -18,6 +18,14 @@
                           <v-card-subtitle v-if="service.medicalService">{{service.medicalService.number}}</v-card-subtitle>
                         </v-card>
                       </v-col>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      color="primary"
+                      dark
+                      v-bind="attrs"
+                      v-on="on"
+                    >Sanitätswachdienst anlegen</v-btn>
+                  </template>
                 </v-card>
               </v-col>
             </v-row>
@@ -37,7 +45,7 @@ export default {
   },
   methods: {
     getServices: async function () {
-      await axios.get('/api/medical-service?active=true')
+      await axios.get(`${process.env.VUE_APP_API_URL}/medical-service?active=true`)
         .then(response => { this.services = response.data })
         .catch(error => { console.log(error) })
     },

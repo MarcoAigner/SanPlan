@@ -196,23 +196,23 @@ export default {
       this.$router.go(-1)
     },
     getArticles: async function () {
-      await axios.get('/api/article')
+      await axios.get(`${process.env.VUE_APP_API_URL}/article`)
         .then(response => { this.articles = response.data })
         .catch(error => { console.log(error) })
     },
     getServices: async function () {
-      await axios.get('/api/medical-service?active=true')
+      await axios.get(`${process.env.VUE_APP_API_URL}/medical-service?active=true`)
         .then(response => { this.services = response.data })
         .catch(error => { console.log(error) })
     },
     getService: async function () {
-      await axios.get(`/api/medical-service/${this.$route.params.service}`)
+      await axios.get(`${process.env.VUE_APP_API_URL}/medical-service/${this.$route.params.service}`)
         .then(response => { this.service = response.data })
         .catch(error => console.log(error))
     },
     getArticleUsage: async function () {
       this.loading = true
-      const url = `/api/article-usage/${this.$route.params.service}`
+      const url = `${process.env.VUE_APP_API_URL}/article-usage/${this.$route.params.service}`
       await axios.get(url)
         .then(response => { this.articleUsages = response.data })
         .catch(error => { console.log(error) })
@@ -232,7 +232,7 @@ export default {
     post: async function () {
       const now = new Date().toISOString()
       this.articleUsage.time = now
-      await axios.post('/api/article-usage', this.articleUsage)
+      await axios.post(`${process.env.VUE_APP_API_URL}/article-usage`, this.articleUsage)
         .catch(error => { console.log(error) })
       await this.getArticleUsage(this.$route.params.service)
       this.article = null
@@ -242,7 +242,7 @@ export default {
     postClose: async function () {
       const now = new Date().toISOString()
       this.articleUsage.time = now
-      await axios.post('/api/article-usage', this.articleUsage)
+      await axios.post(`${process.env.VUE_APP_API_URL}/article-usage`, this.articleUsage)
         .catch(error => { console.log(error) })
       await this.getArticleUsage(this.$route.params.service)
       this.article = null
