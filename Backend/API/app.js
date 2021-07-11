@@ -1,12 +1,21 @@
 const express = require('express');
 const {PrismaClient} = require('@prisma/client');
 const morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 8081
 
+const corsAllowlist = ['https://marcoaigner.github.io', 'http://localhost:8080'];
 
 const apiRouter = require('./api/api')
+
+app.use(cors({
+  origin(origin, callback) {
+    if (corsAllowlist.includes(origin) || !origin) return callback(null, true);
+    else callback(new Error('Not allowed by CORS!'));
+  }
+}));
 
 //Parse the bodies of incoming requests as json-data
 app.use(express.json());

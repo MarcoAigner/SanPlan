@@ -1,9 +1,9 @@
 <template>
-    <v-container class="fill-height" fluid>
+    <v-container fluid>
             <v-row align="center" justify="center">
               <v-col cols="12" sm="8">
                 <v-card :loading="loading">
-                    <v-toolbar color="primary" dark flat>
+                  <v-toolbar color="primary" dark flat>
                       <v-btn
                             icon
                             dark
@@ -16,7 +16,6 @@
                     <v-card-text>
                     <br>
                     <v-data-table
-                    height="25em"
                       :headers="tableHeaders"
                       :items="tableData"
                       :loading="loading"
@@ -172,6 +171,32 @@ export default {
         value: 'time'
       }
 
+    ],
+    names: [
+      {
+        firstName: 'Sunny',
+        lastName: 'Täter'
+      },
+      {
+        firstName: 'Otto',
+        lastName: 'Päde'
+      },
+      {
+        firstName: 'Ernst',
+        lastName: 'Fall'
+      },
+      {
+        firstName: 'Lisa',
+        lastName: 'Bonn'
+      },
+      {
+        firstName: 'Wilma',
+        lastName: 'Ruhe'
+      },
+      {
+        firstName: 'Henry',
+        lastName: 'Dunant'
+      }
     ]
   }),
   mounted () {
@@ -196,23 +221,23 @@ export default {
       this.$router.go(-1)
     },
     getArticles: async function () {
-      await axios.get('/api/article')
+      await axios.get(`${process.env.VUE_APP_API_URL}/article`)
         .then(response => { this.articles = response.data })
         .catch(error => { console.log(error) })
     },
     getServices: async function () {
-      await axios.get('/api/medical-service?active=true')
+      await axios.get(`${process.env.VUE_APP_API_URL}/medical-service?active=true`)
         .then(response => { this.services = response.data })
         .catch(error => { console.log(error) })
     },
     getService: async function () {
-      await axios.get(`/api/medical-service/${this.$route.params.service}`)
+      await axios.get(`${process.env.VUE_APP_API_URL}/medical-service/${this.$route.params.service}`)
         .then(response => { this.service = response.data })
         .catch(error => console.log(error))
     },
     getArticleUsage: async function () {
       this.loading = true
-      const url = `/api/article-usage/${this.$route.params.service}`
+      const url = `${process.env.VUE_APP_API_URL}/article-usage/${this.$route.params.service}`
       await axios.get(url)
         .then(response => { this.articleUsages = response.data })
         .catch(error => { console.log(error) })
@@ -224,7 +249,7 @@ export default {
         article: el.article.name,
         unit: el.article.unit,
         quantity: el.quantity,
-        person: `${el.usedBy.lastName}, ${el.usedBy.firstName}`,
+        person: `${el.usedBy.firstName} ${el.usedBy.lastName}`,
         time: new Date(el.time).toLocaleString('de-DE')
       }))
       this.tableData = tableData.reverse()
@@ -232,7 +257,7 @@ export default {
     post: async function () {
       const now = new Date().toISOString()
       this.articleUsage.time = now
-      await axios.post('/api/article-usage', this.articleUsage)
+      await axios.post(`${process.env.VUE_APP_API_URL}/article-usage`, this.articleUsage)
         .catch(error => { console.log(error) })
       await this.getArticleUsage(this.$route.params.service)
       this.article = null
@@ -242,7 +267,7 @@ export default {
     postClose: async function () {
       const now = new Date().toISOString()
       this.articleUsage.time = now
-      await axios.post('/api/article-usage', this.articleUsage)
+      await axios.post(`${process.env.VUE_APP_API_URL}/article-usage`, this.articleUsage)
         .catch(error => { console.log(error) })
       await this.getArticleUsage(this.$route.params.service)
       this.article = null
@@ -266,14 +291,14 @@ export default {
       }
     },
     articleUsage: function () {
+      const random = max => Math.floor(Math.random() * Math.floor(max))
+      const person = this.names[random(this.names.length)]
+      console.log(person)
       return {
         serviceUuid: this.$route.params.service,
         articleId: this.unit,
         quantity: this.quantity,
-        usedBy: {
-          firstName: 'Max',
-          lastName: 'Mustermensch'
-        }
+        usedBy: person
       }
     },
     articleTitles: function () {

@@ -37,12 +37,12 @@ export default {
   },
   methods: {
     getServices: async function () {
-      await axios.get('/api/medical-service?active=true')
+      await axios.get(`${process.env.VUE_APP_API_URL}/medical-service?active=true`)
         .then(response => { this.services = response.data })
         .catch(error => { console.log(error) })
     },
     getArticles: async function () {
-      await axios.get('/api/article')
+      await axios.get(`${process.env.VUE_APP_API_URL}/article`)
         .then(response => { this.articles = response.data })
         .catch(error => { console.log(error) })
     }
