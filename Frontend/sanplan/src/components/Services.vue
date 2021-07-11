@@ -10,13 +10,14 @@
                           <v-toolbar-title
                            class="pl-4"
                           >Aktive Sanitätswachdienste</v-toolbar-title>
-                          <v-btn
+                        </v-row>
+                        </v-toolbar>
+                      <v-btn
                             color="red"
+                            dark
                             @click="resetDemo"
                             class="pr-4"
                           >Demo zurücksetzen</v-btn>
-                        </v-row>
-                        </v-toolbar>
                       <v-col
                         v-for="(service, id) in services"
                         :key="id"
@@ -29,7 +30,8 @@
                           <v-card-subtitle v-if="service.medicalService">{{service.medicalService.number}}</v-card-subtitle>
                         </v-card>
                       </v-col>
-                  <v-dialog
+                  <v-card-actions>
+                    <v-dialog
                     v-model="dialog"
                     width="500"
                     :scrollable="false"
@@ -40,7 +42,7 @@
                       dark
                       v-bind="attrs"
                       v-on="on"
-                    >Sanitätswachdienst anlegen</v-btn>
+                    >Neuer Sanitätswachdienst</v-btn>
                   </template>
                   <v-card>
                     <v-toolbar color="primary" dark flat>
@@ -75,6 +77,7 @@
                     </v-card-actions>
                   </v-card>
                   </v-dialog>
+                  </v-card-actions>
                 </v-card>
               </v-col>
             </v-row>
@@ -118,9 +121,10 @@ export default {
     resetDemo: async function () {
       this.resetDialog = true
       await axios.get(`${process.env.VUE_APP_API_URL}/reset`)
-        .then()
+        .then(() => (this.resetDialog = false))
         .catch(error => console.log(error))
-      this.resetDialog = false
+      this.getServices()
+      // this.resetDialog = false
     },
     resetInput: function () {
       if (this.dialog === true) {
