@@ -7,9 +7,14 @@ const prisma = new PrismaClient();
 articleUsageRouter.get("/:uuid", async (req, res, next) => {
   try {
     const uuid = req.params.uuid;
-    const foundArticleUsage = await prisma.articleUsage.findUnique({
-      where: {uuid},
-      include: {article: true, usedBy: true, service: true}
+    console.log(uuid);
+    const foundArticleUsage = await prisma.articleUsage.findMany({
+      where: {
+        service: {
+          uuid
+        },
+      },
+      include: {article: true, usedBy: true}
     })
     if (!foundArticleUsage) {
       res.send(`No article usage has been recorded yet for service with uuid ${uuid}`);
