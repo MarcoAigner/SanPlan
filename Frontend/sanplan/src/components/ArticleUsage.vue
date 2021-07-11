@@ -164,9 +164,6 @@ export default {
 
     ]
   }),
-  mounted () {
-    this.getArticleUsage()
-  },
   props: {
     articles: Array,
     services: Array
@@ -175,6 +172,9 @@ export default {
     articleUsages: function () {
       this.loading = false
       this.getTableData()
+    },
+    services: function () {
+      this.getArticleUsage()
     }
   },
   methods: {
