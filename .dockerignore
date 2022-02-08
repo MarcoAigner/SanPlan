@@ -1,0 +1,5 @@
+.dockerignore
+Dockerfile
+Frontend
+Backend/Datenbank
+node_modules
